@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Фабрика лабиринтов для детских журналов</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero panel">
+        <div>
+          <p class="eyebrow">Vova Factory</p>
+          <h1>Генератор лабиринтов для детских журналов</h1>
+          <p class="lead">
+            Создавайте прямоугольные, круглые, треугольные, гексагональные, островные и картинные лабиринты
+            с разной сложностью, стилем и готовым решением для редактора.
+          </p>
+        </div>
+        <div class="hero-badge" aria-hidden="true">✦</div>
+      </section>
+
+      <section class="workspace">
+        <aside class="controls panel" aria-label="Настройки лабиринта">
+          <h2>Настройки</h2>
+          <label>
+            Вид лабиринта
+            <select id="mazeType">
+              <option value="rect">Классический прямоугольный</option>
+              <option value="circle">Круговой спиральный</option>
+              <option value="triangle">Треугольная сетка</option>
+              <option value="hex">Гексагональные соты</option>
+              <option value="honey">Медовые соты с цветами</option>
+              <option value="islands">Острова и мостики</option>
+              <option value="picture">Картинка по каркасу</option>
+              <option value="houses">Маршруты между домиками</option>
+            </select>
+          </label>
+
+          <label>
+            Сложность
+            <select id="difficulty">
+              <option value="easy">Лёгкая</option>
+              <option value="medium" selected>Средняя</option>
+              <option value="hard">Сложная</option>
+              <option value="expert">Экспертная</option>
+            </select>
+          </label>
+
+          <label>
+            Вариация ходов
+            <select id="variation">
+              <option value="perfect" selected>Классический один путь</option>
+              <option value="braid">Больше развилок и петель</option>
+              <option value="long">Длинные запутанные коридоры</option>
+              <option value="rooms">Комнаты и площади</option>
+            </select>
+          </label>
+
+          <label>
+            Стиль оформления
+            <select id="theme">
+              <option value="space">Космос</option>
+              <option value="jungle">Джунгли</option>
+              <option value="sea">Море</option>
+              <option value="candy">Сладости</option>
+              <option value="dino">Динозавры</option>
+              <option value="fairy">Сказка</option>
+            </select>
+          </label>
+
+          <label>
+            Размер
+            <input id="size" type="range" min="8" max="30" value="16" />
+            <span id="sizeLabel">16 × 16</span>
+          </label>
+
+          <label>
+            Домиков для соединения
+            <input id="houseCount" type="range" min="1" max="6" value="4" />
+            <span id="houseCountLabel">4 домика</span>
+          </label>
+
+          <label>
+            Поворот лабиринта
+            <select id="rotation">
+              <option value="0" selected>Без поворота</option>
+              <option value="45">Повернуть на 45°</option>
+              <option value="-45">Повернуть на -45°</option>
+              <option value="90">Повернуть на 90°</option>
+            </select>
+          </label>
+
+          <label>
+            Вариативность
+            <input id="seed" type="text" value="journal-001" />
+          </label>
+
+          <div class="toggles">
+            <label><input id="showSolution" type="checkbox" /> Показать решение</label>
+            <label><input id="decorate" type="checkbox" checked /> Красивая картинка вокруг каркаса</label>
+          </div>
+
+          <div class="button-row">
+            <button id="generateBtn" type="button">Сгенерировать</button>
+            <button id="randomBtn" type="button" class="secondary">Случайно</button>
+          </div>
+          <button id="downloadBtn" type="button" class="download">Скачать PNG</button>
+        </aside>
+
+        <section class="preview panel">
+          <div class="preview-header">
+            <div>
+              <p class="eyebrow">Предпросмотр</p>
+              <h2 id="mazeTitle">Классический прямоугольный</h2>
+            </div>
+            <div class="meta" id="mazeMeta">Средняя · Космос</div>
+          </div>
+          <canvas id="mazeCanvas" width="1100" height="1100" aria-label="Сгенерированный лабиринт"></canvas>
+        </section>
+      </section>
+
+      <section class="feature-grid">
+        <article class="panel">
+          <h3>Все основные формы</h3>
+          <p>DFS-генерация с адаптированной визуализацией: клетки, кольца, треугольники, соты, острова, сюжетные рамки и маршруты между домиками.</p>
+        </article>
+        <article class="panel">
+          <h3>Для печати</h3>
+          <p>Высокое разрешение canvas, контрастные линии, старт/финиш, опциональный путь решения и экспорт в PNG.</p>
+        </article>
+        <article class="panel">
+          <h3>Оформление</h3>
+          <p>Темы добавляют палитру, фоновые иллюстрации, героев, домики, мягкие тени, стикеры и декоративные элементы вокруг лабиринта.</p>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
