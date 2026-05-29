@@ -22,29 +22,29 @@ function optionalControl(selector, value = '', checked = false) {
 const canvas = requiredElement('#mazeCanvas');
 const ctx = canvas.getContext('2d');
 const controls = {
-  type: optionalControl('#mazeType', 'rect'),
-  difficulty: optionalControl('#difficulty', 'medium'),
-  pattern: optionalControl('#pattern', 'balanced'),
-  theme: optionalControl('#theme', 'ink'),
-  size: optionalControl('#size', '16'),
-  sizeLabel: optionalControl('#sizeLabel'),
-  rotation: optionalControl('#rotation', '0'),
-  rotationLabel: optionalControl('#rotationLabel'),
-  stroke: optionalControl('#stroke', '110'),
-  strokeLabel: optionalControl('#strokeLabel'),
-  seed: optionalControl('#seed', 'journal-001'),
-  showSolution: optionalControl('#showSolution'),
-  openEntrances: optionalControl('#openEntrances', '', true),
-  invert: optionalControl('#invert'),
-  guide: optionalControl('#guide'),
-  generate: optionalControl('#generateBtn'),
-  random: optionalControl('#randomBtn'),
-  download: optionalControl('#downloadBtn'),
-  svg: optionalControl('#svgBtn'),
-  copyPrompt: optionalControl('#copyPromptBtn'),
-  title: optionalControl('#mazeTitle'),
-  meta: optionalControl('#mazeMeta'),
-  aiPrompt: optionalControl('#aiPrompt'),
+  type: document.querySelector('#mazeType'),
+  difficulty: document.querySelector('#difficulty'),
+  pattern: document.querySelector('#pattern'),
+  theme: document.querySelector('#theme'),
+  size: document.querySelector('#size'),
+  sizeLabel: document.querySelector('#sizeLabel'),
+  rotation: document.querySelector('#rotation'),
+  rotationLabel: document.querySelector('#rotationLabel'),
+  stroke: document.querySelector('#stroke'),
+  strokeLabel: document.querySelector('#strokeLabel'),
+  seed: document.querySelector('#seed'),
+  showSolution: document.querySelector('#showSolution'),
+  openEntrances: document.querySelector('#openEntrances'),
+  invert: document.querySelector('#invert'),
+  guide: document.querySelector('#guide'),
+  generate: document.querySelector('#generateBtn'),
+  random: document.querySelector('#randomBtn'),
+  download: document.querySelector('#downloadBtn'),
+  svg: document.querySelector('#svgBtn'),
+  copyPrompt: document.querySelector('#copyPromptBtn'),
+  title: document.querySelector('#mazeTitle'),
+  meta: document.querySelector('#mazeMeta'),
+  aiPrompt: document.querySelector('#aiPrompt'),
 };
 
 const typeNames = {
@@ -52,16 +52,15 @@ const typeNames = {
   circle: 'Идеально круговой',
   triangle: 'Треугольная сетка',
   hex: 'Соты / гексагональный',
-  spiral: 'Прямолинейная спираль',
-  crystal: 'Кристалл с прямыми гранями',
-  weave: 'Плетёный ортогональный',
-  wave: 'Ломаный ортогональный',
+  spiral: 'Спиральный тоннель',
+  crystal: 'Кристалл',
+  weave: 'Плетёный',
+  wave: 'Волновой',
 };
 
 const difficultyNames = { easy: 'Лёгкая', medium: 'Средняя', hard: 'Сложная', expert: 'Экспертная' };
 const difficultyScale = { easy: 0.72, medium: 1, hard: 1.25, expert: 1.55 };
-const braidAmount = { easy: 0, medium: 0.015, hard: 0.04, expert: 0.08 };
-const patternNames = { balanced: 'Сбалансированный', corridors: 'Длинные коридоры', turns: 'Больше поворотов' };
+const braidAmount = { easy: 0, medium: 0.02, hard: 0.06, expert: 0.12 };
 const themes = {
   ink: { name: 'Типографская', bg: '#f8fafc', wall: '#111827', path: '#ffffff', accent: '#ef4444', guide: '#d1d5db' },
   blueprint: { name: 'Чертёжная', bg: '#0f2a4a', wall: '#e0f2fe', path: '#123b66', accent: '#facc15', guide: '#60a5fa' },
@@ -169,7 +168,7 @@ function makeHexGrid(cols, rows) {
   })));
 }
 
-function carveHexMaze(cols, rows, random, braid = 0, pattern = 'balanced') {
+function carveHexMaze(cols, rows, random, braid = 0) {
   const grid = makeHexGrid(cols, rows);
   const stack = [grid[0][0]];
   grid[0][0].visited = true;
@@ -180,7 +179,7 @@ function carveHexMaze(cols, rows, random, braid = 0, pattern = 'balanced') {
 
   while (stack.length) {
     const current = stack[stack.length - 1];
-    const choices = orderDirections(dirs, current, random, pattern).filter(([, dq, dr]) => {
+    const choices = shuffle([...dirs], random).filter(([, dq, dr]) => {
       const next = grid[current.y + dr]?.[current.x + dq];
       return next && !next.visited;
     });
@@ -191,7 +190,6 @@ function carveHexMaze(cols, rows, random, braid = 0, pattern = 'balanced') {
     next.walls[back] = false;
     next.visited = true;
     next.prev = current;
-    next.fromDir = dir;
     stack.push(next);
   }
 
@@ -218,27 +216,24 @@ function solutionPath(grid) {
 }
 
 function config() {
-  const type = typeNames[controls.type.value] ? controls.type.value : 'rect';
-  const difficulty = difficultyNames[controls.difficulty.value] ? controls.difficulty.value : 'medium';
-  const pattern = patternNames[controls.pattern.value] ? controls.pattern.value : 'balanced';
-  const themeKey = themes[controls.theme.value] ? controls.theme.value : 'ink';
-  const base = Number(controls.size.value) || 16;
-  const scale = difficultyScale[difficulty];
+  const type = controls.type.value;
+  const base = Number(controls.size.value);
+  const scale = difficultyScale[controls.difficulty.value];
   const cols = Math.max(6, Math.min(42, Math.round(base * scale)));
   return {
     type,
-    difficulty,
-    pattern,
-    theme: themes[themeKey],
+    difficulty: controls.difficulty.value,
+    pattern: controls.pattern.value,
+    theme: themes[controls.theme.value],
     seed: controls.seed.value || 'maze',
     showSolution: controls.showSolution.checked,
     openEntrances: controls.openEntrances.checked,
     invert: controls.invert.checked,
     guide: controls.guide.checked,
-    rotation: Number(controls.rotation.value) || 0,
-    strokeScale: (Number(controls.stroke.value) || 110) / 100,
+    rotation: Number(controls.rotation.value),
+    strokeScale: Number(controls.stroke.value) / 100,
     cols,
-    rows: Math.max(6, Math.min(42, type === 'circle' || type === 'hex' ? cols : cols)),
+    rows: Math.max(6, Math.min(42, type === 'circle' ? cols : Math.round(cols * (type === 'wave' ? 0.72 : 1)))),
   };
 }
 
@@ -288,8 +283,8 @@ function withRotation(cfg, draw) {
 function shouldOpen(cell, wall, grid, cfg) {
   if (!cfg.openEntrances) return false;
   const last = grid[grid.length - 1][grid[0].length - 1];
-  return (cell.x === 0 && cell.y === 0 && ['w', 'n', 'nw'].includes(wall))
-    || (cell.x === last.x && cell.y === last.y && ['e', 's', 'se'].includes(wall));
+  return (cell.x === 0 && cell.y === 0 && (wall === 'w' || wall === 'n'))
+    || (cell.x === last.x && cell.y === last.y && (wall === 'e' || wall === 's'));
 }
 
 function guideLine(cfg, draw) {
@@ -302,79 +297,34 @@ function guideLine(cfg, draw) {
   ctx.restore();
 }
 
-
-function segmentKey(x1, y1, x2, y2) {
-  const a = [Math.round(x1 * 1000), Math.round(y1 * 1000)];
-  const b = [Math.round(x2 * 1000), Math.round(y2 * 1000)];
-  const first = a[0] < b[0] || (a[0] === b[0] && a[1] <= b[1]) ? a : b;
-  const second = first === a ? b : a;
-  return `${first[0]},${first[1]}:${second[0]},${second[1]}`;
-}
-
-function uniqueSegments(segments) {
-  const map = new Map();
-  segments.forEach((segment) => {
-    map.set(segmentKey(...segment), segment);
-  });
-  return [...map.values()];
-}
-
-function drawMergedOrthogonalSegments(segments) {
-  const horizontal = new Map();
-  const vertical = new Map();
-  uniqueSegments(segments).forEach(([x1, y1, x2, y2]) => {
-    if (Math.abs(y1 - y2) < 0.001) {
-      const y = Math.round(y1 * 1000) / 1000;
-      if (!horizontal.has(y)) horizontal.set(y, []);
-      horizontal.get(y).push([Math.min(x1, x2), Math.max(x1, x2)]);
-    } else if (Math.abs(x1 - x2) < 0.001) {
-      const x = Math.round(x1 * 1000) / 1000;
-      if (!vertical.has(x)) vertical.set(x, []);
-      vertical.get(x).push([Math.min(y1, y2), Math.max(y1, y2)]);
-    }
-  });
-
-  ctx.beginPath();
-  horizontal.forEach((ranges, y) => {
-    if (!ranges.length) return;
-    ranges.sort((a, b) => a[0] - b[0]);
-    let [start, end] = ranges[0];
-    for (let i = 1; i < ranges.length; i += 1) {
-      const [nextStart, nextEnd] = ranges[i];
-      if (nextStart <= end + 0.001) end = Math.max(end, nextEnd);
-      else { ctx.moveTo(start, y); ctx.lineTo(end, y); [start, end] = [nextStart, nextEnd]; }
-    }
-    ctx.moveTo(start, y); ctx.lineTo(end, y);
-  });
-  vertical.forEach((ranges, x) => {
-    if (!ranges.length) return;
-    ranges.sort((a, b) => a[0] - b[0]);
-    let [start, end] = ranges[0];
-    for (let i = 1; i < ranges.length; i += 1) {
-      const [nextStart, nextEnd] = ranges[i];
-      if (nextStart <= end + 0.001) end = Math.max(end, nextEnd);
-      else { ctx.moveTo(x, start); ctx.lineTo(x, end); [start, end] = [nextStart, nextEnd]; }
-    }
-    ctx.moveTo(x, start); ctx.lineTo(x, end);
-  });
-  ctx.stroke();
-}
-
-function drawUniqueSegments(segments) {
-  ctx.beginPath();
-  uniqueSegments(segments).forEach(([x1, y1, x2, y2]) => {
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-  });
-  ctx.stroke();
-}
-
-function rectCenter(cell, pad, cellW, cellH) {
-  return [pad + cell.x * cellW + cellW / 2, pad + cell.y * cellH + cellH / 2];
-}
-
-function orthogonalVariantOffset() {
-  return [0, 0];
+function rectCenter(cell, pad, cellW, cellH, type) {
+  let x = pad + cell.x * cellW + cellW / 2;
+  let y = pad + cell.y * cellH + cellH / 2;
+  if (type === 'wave') {
+    x += Math.sin(cell.y * 0.82) * cellW * 0.38;
+    y += Math.sin(cell.x * 0.55) * cellH * 0.16;
+  }
+  if (type === 'spiral') {
+    const cx = 600;
+    const cy = 600;
+    const dx = x - cx;
+    const dy = y - cy;
+    const dist = Math.hypot(dx, dy);
+    const turn = dist * 0.0026;
+    const angle = Math.atan2(dy, dx) + turn;
+    x = cx + Math.cos(angle) * dist;
+    y = cy + Math.sin(angle) * dist;
+  }
+  if (type === 'crystal') {
+    const cx = 600;
+    const cy = 600;
+    const dx = x - cx;
+    const dy = y - cy;
+    const scale = 1 - Math.min(0.22, Math.abs(dx * dy) / 920000);
+    x = cx + dx * scale;
+    y = cy + dy * scale;
+  }
+  return [x, y];
 }
 
 function drawRectLikeMaze(grid, cfg) {
@@ -384,8 +334,8 @@ function drawRectLikeMaze(grid, cfg) {
   const h = canvas.height - pad * 2;
   const cellW = w / grid[0].length;
   const cellH = h / grid.length;
-  ctx.lineCap = 'butt';
-  ctx.lineJoin = 'miter';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   ctx.strokeStyle = colors.wall;
   ctx.lineWidth = Math.max(3, Math.min(cellW, cellH) * 0.13 * cfg.strokeScale);
 
@@ -400,50 +350,27 @@ function drawRectLikeMaze(grid, cfg) {
 
   const segments = [];
   grid.flat().forEach((cell) => {
-    const [cx, cy] = rectCenter(cell, pad, cellW, cellH);
+    const [cx, cy] = rectCenter(cell, pad, cellW, cellH, cfg.type);
     const halfW = cellW / 2;
     const halfH = cellH / 2;
-    if (cell.walls.n && !shouldOpen(cell, 'n', grid, cfg)) segments.push([cx - halfW, cy - halfH, cx + halfW, cy - halfH]);
-    if (cell.walls.e && !shouldOpen(cell, 'e', grid, cfg)) segments.push([cx + halfW, cy - halfH, cx + halfW, cy + halfH]);
-    if (cell.walls.s && !shouldOpen(cell, 's', grid, cfg)) segments.push([cx + halfW, cy + halfH, cx - halfW, cy + halfH]);
-    if (cell.walls.w && !shouldOpen(cell, 'w', grid, cfg)) segments.push([cx - halfW, cy + halfH, cx - halfW, cy - halfH]);
+    const skew = cfg.type === 'weave' && (cell.x + cell.y) % 2 ? cellW * 0.12 : 0;
+    ctx.beginPath();
+    if (cell.walls.n && !shouldOpen(cell, 'n', grid, cfg)) { ctx.moveTo(cx - halfW + skew, cy - halfH); ctx.lineTo(cx + halfW + skew, cy - halfH); }
+    if (cell.walls.e && !shouldOpen(cell, 'e', grid, cfg)) { ctx.moveTo(cx + halfW, cy - halfH + skew); ctx.lineTo(cx + halfW, cy + halfH + skew); }
+    if (cell.walls.s && !shouldOpen(cell, 's', grid, cfg)) { ctx.moveTo(cx + halfW - skew, cy + halfH); ctx.lineTo(cx - halfW - skew, cy + halfH); }
+    if (cell.walls.w && !shouldOpen(cell, 'w', grid, cfg)) { ctx.moveTo(cx - halfW, cy + halfH - skew); ctx.lineTo(cx - halfW, cy - halfH - skew); }
+    ctx.stroke();
   });
   drawMergedOrthogonalSegments(segments);
 
-  drawOrthogonalVariantGuide(cfg, pad, w, h, cellW, cellH);
   if (cfg.showSolution) {
-    drawPointSolution(solutionPath(grid).map((cell) => rectCenter(cell, pad, cellW, cellH)), cfg, Math.min(cellW, cellH));
+    drawPointSolution(solutionPath(grid).map((cell) => rectCenter(cell, pad, cellW, cellH, cfg.type)), cfg, Math.min(cellW, cellH));
   }
-  drawMarkers(...rectCenter(grid[0][0], pad, cellW, cellH), ...rectCenter(grid[grid.length - 1][grid[0].length - 1], pad, cellW, cellH), cfg);
+  drawMarkers(...rectCenter(grid[0][0], pad, cellW, cellH, cfg.type), ...rectCenter(grid[grid.length - 1][grid[0].length - 1], pad, cellW, cellH, cfg.type), cfg);
 }
 
-function drawOrthogonalVariantGuide(cfg, pad, width, height, cellW, cellH) {
-  if (!['spiral', 'crystal', 'wave'].includes(cfg.type)) return;
-  const colors = palette(cfg);
-  ctx.save();
-  ctx.strokeStyle = colors.guide;
-  ctx.lineWidth = Math.max(2, Math.min(cellW, cellH) * 0.045 * cfg.strokeScale);
-  ctx.globalAlpha = 0.72;
-  ctx.beginPath();
-  if (cfg.type === 'spiral') {
-    let left = pad + cellW;
-    let top = pad + cellH;
-    let right = pad + width - cellW;
-    let bottom = pad + height - cellH;
-    while (left < right && top < bottom) {
-      ctx.moveTo(left, top); ctx.lineTo(right, top); ctx.lineTo(right, bottom); ctx.lineTo(left, bottom); ctx.lineTo(left, top + cellH);
-      left += cellW * 1.8; top += cellH * 1.8; right -= cellW * 1.8; bottom -= cellH * 1.8;
-    }
-  } else if (cfg.type === 'crystal') {
-    ctx.moveTo(600, pad); ctx.lineTo(pad + width, 600); ctx.lineTo(600, pad + height); ctx.lineTo(pad, 600); ctx.closePath();
-    ctx.moveTo(600, pad); ctx.lineTo(600, pad + height); ctx.moveTo(pad, 600); ctx.lineTo(pad + width, 600);
-  } else {
-    for (let y = 0; y <= height; y += cellH * 2) {
-      ctx.moveTo(pad, pad + y); ctx.lineTo(pad + width, pad + y + cellH);
-    }
-  }
-  ctx.stroke();
-  ctx.restore();
+function triangleCenter(cellData, pad, cell, height) {
+  return [pad + cellData.x * cell + cell / 2, pad + cellData.y * height + height / 2];
 }
 
 function triangleCenter(cellData, pad, cell, height) {
@@ -480,58 +407,45 @@ function drawTriangleMaze(grid, cfg) {
   drawMarkers(pad + cell * 0.5, pad + height * 0.5, pad + w - cell * 0.5, pad + grid.length * height - height * 0.5, cfg);
 }
 
-function hexMetrics(grid) {
-  const cols = grid[0].length;
-  const rows = grid.length;
-  const availableW = 900;
-  const availableH = 900;
-  const radius = Math.min(availableW / (Math.sqrt(3) * (cols + rows / 2 + 0.5)), availableH / (1.5 * rows + 0.5));
-  const width = Math.sqrt(3) * radius * (cols + rows / 2);
-  const height = radius * (1.5 * rows + 0.5);
-  return { radius, originX: (canvas.width - width) / 2 + radius, originY: (canvas.height - height) / 2 + radius };
-}
-
-function hexCenter(cellData, metrics) {
-  return [
-    metrics.originX + Math.sqrt(3) * metrics.radius * (cellData.x + cellData.y / 2),
-    metrics.originY + 1.5 * metrics.radius * cellData.y,
-  ];
+function hexCenter(cellData, pad, radius, h) {
+  return [pad + radius + cellData.x * radius * 1.5, pad + radius + cellData.y * h + (cellData.x % 2 ? h / 2 : 0)];
 }
 
 function drawHexMaze(grid, cfg) {
   const colors = palette(cfg);
-  const metrics = hexMetrics(grid);
-  const radius = metrics.radius;
-  const sideSegments = {
-    ne: [0, 1], nw: [1, 2], w: [2, 3], sw: [3, 4], se: [4, 5], e: [5, 0],
-  };
+  const pad = 150;
+  const radius = (canvas.width - pad * 2) / (grid[0].length * 1.75);
+  const h = Math.sqrt(3) * radius;
   ctx.strokeStyle = colors.wall;
-  ctx.lineWidth = Math.max(3, radius * 0.16 * cfg.strokeScale);
-  ctx.lineCap = 'butt';
-  ctx.lineJoin = 'miter';
-
-  const segments = [];
+  ctx.lineWidth = Math.max(3, radius * 0.14 * cfg.strokeScale);
   grid.flat().forEach((cell) => {
-    const [cx, cy] = hexCenter(cell, metrics);
+    const [cx, cy] = hexCenter(cell, pad, radius, h);
     const pts = Array.from({ length: 6 }, (_, i) => {
       const angle = Math.PI / 6 + (Math.PI * 2 * i) / 6;
       return [cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius];
     });
-    Object.entries(sideSegments).forEach(([key, [a, b]]) => {
+    ['n', 'e', 's', 'w'].forEach((key, index) => {
       if (!cell.walls[key] || shouldOpen(cell, key, grid, cfg)) return;
-      segments.push([pts[a][0], pts[a][1], pts[b][0], pts[b][1]]);
+      const a = (index + 5) % 6;
+      const b = (index + 1) % 6;
+      ctx.beginPath(); ctx.moveTo(pts[a][0], pts[a][1]); ctx.lineTo(pts[b][0], pts[b][1]); ctx.stroke();
     });
   });
-  drawUniqueSegments(segments);
   if (cfg.showSolution) {
-    drawPointSolution(solutionPath(grid).map((cellData) => hexCenter(cellData, metrics)), cfg, radius);
+    drawPointSolution(solutionPath(grid).map((cellData) => hexCenter(cellData, pad, radius, h)), cfg, radius);
   }
-  drawMarkers(...hexCenter(grid[0][0], metrics), ...hexCenter(grid[grid.length - 1][grid[0].length - 1], metrics), cfg);
+  drawMarkers(...hexCenter(grid[0][0], pad, radius, h), ...hexCenter(grid[grid.length - 1][grid[0].length - 1], pad, radius, h), cfg);
 }
 
 function circleCenter(cellData, sectors, step) {
   const angle = ((cellData.x + 0.5) / sectors) * Math.PI * 2 - Math.PI / 2;
   const radius = 58 + (cellData.y + 0.5) * step;
+  return [canvas.width / 2 + Math.cos(angle) * radius, canvas.height / 2 + Math.sin(angle) * radius];
+}
+
+function circleCenter(cellData, sectors, step) {
+  const angle = ((cellData.x + 0.5) / sectors) * Math.PI * 2 - Math.PI / 2;
+  const radius = 52 + (cellData.y + 0.5) * step;
   return [canvas.width / 2 + Math.cos(angle) * radius, canvas.height / 2 + Math.sin(angle) * radius];
 }
 
@@ -575,13 +489,12 @@ function radial(cx, cy, r1, r2, a) { ctx.beginPath(); ctx.moveTo(cx + Math.cos(a
 
 function drawPointSolution(points, cfg, scale) {
   const colors = palette(cfg);
-  const width = Math.max(5, scale * 0.18 * cfg.strokeScale);
   ctx.save();
+  ctx.strokeStyle = colors.accent;
+  ctx.lineWidth = Math.max(6, scale * 0.22 * cfg.strokeScale);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = colors.path;
-  ctx.lineWidth = width + Math.max(6, width * 0.85);
-  ctx.globalAlpha = 0.96;
+  ctx.globalAlpha = 0.9;
   ctx.beginPath();
   points.forEach(([x, y], index) => {
     if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
@@ -590,12 +503,18 @@ function drawPointSolution(points, cfg, scale) {
   ctx.strokeStyle = colors.accent;
   ctx.lineWidth = width;
   ctx.globalAlpha = 1;
+  ctx.setLineDash([width * 2.8, width * 1.4]);
   ctx.beginPath();
   points.forEach(([x, y], index) => {
     if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
   ctx.stroke();
+  ctx.setLineDash([]);
   ctx.restore();
+}
+
+function drawSolution(path, pad, cellW, cellH, cfg) {
+  drawPointSolution(path.map((cell) => [pad + cell.x * cellW + cellW / 2, pad + cell.y * cellH + cellH / 2]), cfg, Math.min(cellW, cellH));
 }
 
 function drawMarkers(sx, sy, gx, gy, cfg) {
@@ -632,15 +551,14 @@ function drawTitle(cfg) {
 }
 
 function aiPrompt(cfg) {
-  return `Clean printable ${typeNames[cfg.type].toLowerCase()} maze, ${difficultyNames[cfg.difficulty].toLowerCase()} difficulty, ${patternNames[cfg.pattern].toLowerCase()} corridor style, ${cfg.theme.name.toLowerCase()} palette, no characters, no icons, no text, pure geometric walls, rotated ${cfg.rotation} degrees, suitable for children's magazine activity page.`;
+  return `Clean printable ${typeNames[cfg.type].toLowerCase()} maze, ${difficultyNames[cfg.difficulty].toLowerCase()} difficulty, ${cfg.theme.name.toLowerCase()} palette, no characters, no icons, no text, pure geometric walls, rotated ${cfg.rotation} degrees, suitable for children's magazine activity page.`;
 }
 
 function render() {
   const cfg = config();
-  const seed = xmur3(`${cfg.seed}-${cfg.type}-${cfg.difficulty}`)();
+  const seed = xmur3(`${cfg.seed}-${cfg.type}-${cfg.difficulty}-${cfg.theme.name}-${cfg.rotation}`)();
   const random = mulberry32(seed);
-  const braid = braidAmount[cfg.difficulty] + (cfg.type === 'weave' ? 0.06 : 0);
-  const grid = cfg.type === 'hex' ? carveHexMaze(cfg.cols, cfg.rows, random, braid, cfg.pattern) : carveMaze(cfg.cols, cfg.rows, random, braid, cfg.pattern);
+  const grid = carveMaze(cfg.cols, cfg.rows, random, braidAmount[cfg.difficulty] + (cfg.type === 'weave' ? 0.1 : 0));
 
   fillBackground(cfg);
   drawBoard(cfg);
@@ -653,7 +571,7 @@ function render() {
   drawTitle(cfg);
 
   controls.title.textContent = typeNames[cfg.type];
-  controls.meta.textContent = `${difficultyNames[cfg.difficulty]} · ${patternNames[cfg.pattern]} · ${cfg.theme.name} · ${cfg.rotation}°`;
+  controls.meta.textContent = `${difficultyNames[cfg.difficulty]} · ${cfg.theme.name} · ${cfg.rotation}°`;
   controls.sizeLabel.textContent = `${cfg.cols} × ${cfg.rows}`;
   controls.rotationLabel.textContent = `${cfg.rotation}°`;
   controls.strokeLabel.textContent = `${controls.stroke.value}%`;
@@ -698,7 +616,7 @@ controls.copyPrompt.addEventListener('click', () => {
 });
 ['change', 'input'].forEach((eventName) => {
   [
-    controls.type, controls.difficulty, controls.pattern, controls.theme, controls.size, controls.rotation, controls.stroke,
+    controls.type, controls.difficulty, controls.theme, controls.size, controls.rotation, controls.stroke,
     controls.showSolution, controls.openEntrances, controls.invert, controls.guide,
   ].forEach((element) => {
     element.addEventListener(eventName, render);
