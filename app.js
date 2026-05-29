@@ -285,6 +285,10 @@ function triangleCenter(cellData, pad, cell, height) {
   return [pad + cellData.x * cell + cell / 2, pad + cellData.y * height + height / 2];
 }
 
+function triangleCenter(cellData, pad, cell, height) {
+  return [pad + cellData.x * cell + cell / 2, pad + cellData.y * height + height / 2];
+}
+
 function drawTriangleMaze(grid, cfg) {
   const colors = palette(cfg);
   const pad = 148;
@@ -351,6 +355,12 @@ function circleCenter(cellData, sectors, step) {
   return [canvas.width / 2 + Math.cos(angle) * radius, canvas.height / 2 + Math.sin(angle) * radius];
 }
 
+function circleCenter(cellData, sectors, step) {
+  const angle = ((cellData.x + 0.5) / sectors) * Math.PI * 2 - Math.PI / 2;
+  const radius = 52 + (cellData.y + 0.5) * step;
+  return [canvas.width / 2 + Math.cos(angle) * radius, canvas.height / 2 + Math.sin(angle) * radius];
+}
+
 function drawCircleMaze(grid, cfg) {
   const colors = palette(cfg);
   const cx = canvas.width / 2;
@@ -403,6 +413,10 @@ function drawPointSolution(points, cfg, scale) {
   });
   ctx.stroke();
   ctx.restore();
+}
+
+function drawSolution(path, pad, cellW, cellH, cfg) {
+  drawPointSolution(path.map((cell) => [pad + cell.x * cellW + cellW / 2, pad + cell.y * cellH + cellH / 2]), cfg, Math.min(cellW, cellH));
 }
 
 function drawMarkers(sx, sy, gx, gy, cfg) {
