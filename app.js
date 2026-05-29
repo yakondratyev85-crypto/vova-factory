@@ -123,6 +123,57 @@ function carveMaze(cols, rows, random, braid = 0) {
   return grid;
 }
 
+
+function makeHexGrid(cols, rows) {
+  return Array.from({ length: rows }, (_, r) => Array.from({ length: cols }, (_, q) => ({
+    x: q,
+    y: r,
+    visited: false,
+    walls: { e: true, ne: true, nw: true, w: true, sw: true, se: true },
+    prev: null,
+  })));
+}
+
+function carveHexMaze(cols, rows, random, braid = 0) {
+  const grid = makeHexGrid(cols, rows);
+  const stack = [grid[0][0]];
+  grid[0][0].visited = true;
+  const dirs = [
+    ['e', 1, 0, 'w'], ['ne', 1, -1, 'sw'], ['nw', 0, -1, 'se'],
+    ['w', -1, 0, 'e'], ['sw', -1, 1, 'ne'], ['se', 0, 1, 'nw'],
+  ];
+
+  while (stack.length) {
+    const current = stack[stack.length - 1];
+    const choices = shuffle([...dirs], random).filter(([, dq, dr]) => {
+      const next = grid[current.y + dr]?.[current.x + dq];
+      return next && !next.visited;
+    });
+    if (!choices.length) { stack.pop(); continue; }
+    const [dir, dq, dr, back] = choices[0];
+    const next = grid[current.y + dr][current.x + dq];
+    current.walls[dir] = false;
+    next.walls[back] = false;
+    next.visited = true;
+    next.prev = current;
+    stack.push(next);
+  }
+
+  if (braid > 0) {
+    grid.flat().forEach((cell) => {
+      const closed = dirs.filter(([dir, dq, dr]) => cell.walls[dir] && grid[cell.y + dr]?.[cell.x + dq]);
+      const open = dirs.length - closed.length;
+      if (open <= 2 && closed.length && random() < braid) {
+        const [dir, dq, dr, back] = closed[Math.floor(random() * closed.length)];
+        const next = grid[cell.y + dr][cell.x + dq];
+        cell.walls[dir] = false;
+        next.walls[back] = false;
+      }
+    });
+  }
+  return grid;
+}
+
 function solutionPath(grid) {
   const path = [];
   let current = grid[grid.length - 1][grid[0].length - 1];
@@ -412,6 +463,16 @@ function drawPointSolution(points, cfg, scale) {
     if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
   ctx.stroke();
+  ctx.strokeStyle = colors.accent;
+  ctx.lineWidth = width;
+  ctx.globalAlpha = 1;
+  ctx.setLineDash([width * 2.8, width * 1.4]);
+  ctx.beginPath();
+  points.forEach(([x, y], index) => {
+    if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
   ctx.restore();
 }
 
