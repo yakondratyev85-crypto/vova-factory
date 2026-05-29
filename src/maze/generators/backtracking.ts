@@ -1,0 +1,5 @@
+import type { Cell } from '../core/types';
+import { shuffle } from '../core/seededRandom';
+export function makeGrid(cols: number, rows: number): Cell[][] { return Array.from({ length: rows }, (_, y) => Array.from({ length: cols }, (_, x) => ({ x, y, walls: { n: true, e: true, s: true, w: true } }))); }
+const dirs = [{ d: 'n', o: 's', dx: 0, dy: -1 }, { d: 'e', o: 'w', dx: 1, dy: 0 }, { d: 's', o: 'n', dx: 0, dy: 1 }, { d: 'w', o: 'e', dx: -1, dy: 0 }] as const;
+export function backtracking(cols: number, rows: number, random: () => number): Cell[][] { const grid = makeGrid(cols, rows); const seen = new Set<string>(['0,0']); const stack: Cell[] = [grid[0]![0]!]; while (stack.length) { const cur = stack[stack.length - 1]!; const options = shuffle([...dirs], random).filter(({ dx, dy }) => { const nx = cur.x + dx, ny = cur.y + dy; return nx >= 0 && ny >= 0 && nx < cols && ny < rows && !seen.has(`${nx},${ny}`); }); if (!options.length) { stack.pop(); continue; } const dir = options[0]!; const next = grid[cur.y + dir.dy]![cur.x + dir.dx]!; cur.walls[dir.d] = false; next.walls[dir.o] = false; seen.add(`${next.x},${next.y}`); stack.push(next); } return grid; }

@@ -1,0 +1,5 @@
+import type { Difficulty, PageFormat, PageSize } from './types';
+export const difficultyGrid: Record<Difficulty, { square: [number, number]; rectangle: [number, number]; circle: [number, number]; road: [number, number] }> = {
+  toddler: { square: [6, 6], rectangle: [6, 8], circle: [4, 10], road: [5, 5] }, easy: { square: [9, 9], rectangle: [8, 11], circle: [5, 14], road: [6, 7] }, medium: { square: [13, 13], rectangle: [12, 16], circle: [7, 20], road: [8, 9] }, hard: { square: [17, 17], rectangle: [16, 22], circle: [9, 28], road: [10, 11] }, expert: { square: [23, 23], rectangle: [20, 28], circle: [11, 36], road: [12, 13] },
+};
+export const pageSizes: Record<PageFormat, PageSize> = { A4_PORTRAIT: { width: 794, height: 1123, label: 'A4 portrait' }, A4_LANDSCAPE: { width: 1123, height: 794, label: 'A4 landscape' }, '900x1200': { width: 900, height: 1200, label: '900 × 1200' }, '1200x900': { width: 1200, height: 900, label: '1200 × 900' }, '1080x1350': { width: 1080, height: 1350, label: '1080 × 1350' }, '1024x1024': { width: 1024, height: 1024, label: '1024 × 1024' }, CUSTOM: { width: 900, height: 1200, label: 'Custom' } };

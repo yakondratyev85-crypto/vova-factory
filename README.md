@@ -1,107 +1,142 @@
 # Maze Worksheet Studio
 
-Локальный генератор детских лабиринтов для журналов, worksheets, раскрасок и печати.
+Локальный MVP-проект на **React + TypeScript + Vite** для генерации детских лабиринтов в формате готовой worksheet-страницы. Основной рендеринг выполняется в **SVG**, поэтому страницу удобно масштабировать, печатать и экспортировать в SVG/PNG/PDF.
 
-Проект сделан максимально просто: **только HTML, CSS и чистый JavaScript**. Никакая сборка не нужна.
+## 1. Установка зависимостей
 
-## Как запустить
-
-1. Скачайте или откройте папку проекта.
-2. Откройте файл `index.html` в браузере двойным кликом.
-3. Пользуйтесь генератором.
-
-Никакая установка не нужна.
-
-```txt
-npm install не нужен.
-npm run dev не нужен.
-Vite не используется.
-React не используется.
-TypeScript не используется.
-Проект работает локально как обычная HTML-страница.
+```bash
+npm install
 ```
 
-Можно также открыть проект через Live Server в VS Code, но это необязательно.
+## 2. Запуск локально
 
-## Что есть в MVP
+```bash
+npm run dev
+```
 
-- Квадратный лабиринт `square maze`.
-- Recursive backtracking генерация.
-- Сложности:
-  - `easy` — 8 × 8;
-  - `medium` — 12 × 12;
-  - `hard` — 18 × 18.
-- Seed-генерация: одинаковый seed даёт одинаковый лабиринт.
-- Если seed пустой, приложение создаёт новый случайный seed.
-- Кнопка `Generate Maze`.
-- Кнопка `Show Solution`.
-- Кнопка `Hide Solution`.
-- Поле `Rotation Angle`.
-- SVG-предпросмотр worksheet-страницы.
-- Старт и финиш.
-- Экспорт `Download SVG`.
-- Экспорт `Download PNG` через canvas.
-- Темы: `basic`, `space`, `forest`, `cats`.
-- Режимы: `color`, `coloring`, `minimal`.
+## 3. Как открыть проект в браузере
 
-## Как пользоваться
+После запуска Vite откройте адрес из терминала, обычно:
 
-1. Выберите сложность или размер лабиринта.
-2. Введите `Seed` или оставьте поле пустым.
-3. Введите угол в `Rotation Angle`, например `0`, `15`, `30`, `45`, `90` или `180`.
-4. Выберите тему и визуальный режим.
-5. Нажмите `Generate Maze`.
-6. Нажмите `Show Solution`, чтобы увидеть путь.
-7. Нажмите `Hide Solution`, чтобы скрыть путь.
-8. Нажмите `Download SVG` или `Download PNG`, чтобы сохранить страницу.
+```txt
+http://localhost:5173
+```
 
-## Как работать через GitHub Desktop
+Проект не требует сервера, базы данных, Docker, авторизации, облачного хранения или деплоя.
 
-1. Откройте репозиторий в GitHub Desktop.
-2. Внесите изменения в файлы.
-3. Проверьте `index.html` в браузере.
-4. Сделайте commit.
+## 4. Как пользоваться генератором
+
+1. В левой панели выберите пресет или настройте страницу вручную.
+2. Выберите `Maze Type`: `square`, `rectangle`, `circle` или `road`.
+3. Настройте `Difficulty`, `Theme`, `Visual Mode`, `Page Format`, `Algorithm`, `Seed`, `Rotation Angle`, `Line Width` и `Path Width`.
+4. Нажмите **Generate**.
+5. Справа появится предпросмотр печатной страницы с заголовком, инструкцией, рамкой, именем ребёнка, стартом, финишем и тематическим декором.
+6. Для автоматической журнальной композиции нажмите **Create Worksheet Page**.
+
+## 5. Как включить и выключить решение
+
+- Нажмите **Show Solution**, чтобы показать цветную линию решения поверх лабиринта.
+- Нажмите **Hide Solution**, чтобы скрыть решение.
+- В поле `Solution Mode` доступны режимы:
+  - `none` — без решения;
+  - `overlay` — решение поверх лабиринта;
+  - `separatePage` — при PDF-экспорте добавляется отдельная страница с ответом;
+  - `teacher` — зарезервировано для будущего teacher-view режима.
+
+## 6. Как экспортировать PNG/SVG/PDF
+
+В верхней части предпросмотра есть кнопки:
+
+- **Export SVG** — сохраняет текущую worksheet-страницу как SVG.
+- **Export PNG** — конвертирует текущий SVG в canvas и сохраняет PNG выбранного размера страницы.
+- **Export PDF** — создаёт PDF через `jsPDF`.
+
+Если выбран `solutionMode: separatePage`, PDF содержит:
+
+1. страницу с лабиринтом без решения;
+2. страницу с тем же лабиринтом и решением.
+
+## 7. Где находятся генераторы лабиринтов
+
+Генераторы находятся в папке:
+
+```txt
+src/maze/generators/
+```
+
+Основные файлы:
+
+- `squareMaze.ts` — квадратный лабиринт;
+- `rectangleMaze.ts` — прямоугольный лабиринт;
+- `circleMaze.ts` — круговой лабиринт на кольцах и секторах;
+- `roadMaze.ts` — широкая дорожка для малышей;
+- `backtracking.ts` — алгоритм recursive backtracking;
+- `prim.ts` — алгоритм Prim;
+- `index.ts` — единая точка выбора генератора по `settings.mazeType`.
+
+## 8. Где находятся темы
+
+Темы находятся в папке:
+
+```txt
+src/maze/themes/
+```
+
+В MVP добавлены 5 тем:
+
+- `space.ts`;
+- `forest.ts`;
+- `ocean.ts`;
+- `dinosaurs.ts`;
+- `cats.ts`.
+
+Общие типы темы находятся в `src/maze/themes/themeTypes.ts`.
+
+## 9. Как добавить новый тип лабиринта
+
+1. Добавьте новое значение в тип `MazeType` или `FutureMazeType` в `src/maze/core/types.ts`.
+2. Создайте генератор в `src/maze/generators/newMaze.ts`.
+3. Верните объект `MazeModel` со стартом, финишем и массивом `solution`.
+4. Подключите генератор в `src/maze/generators/index.ts`.
+5. Добавьте SVG-отрисовку в `src/maze/render/renderMazeSvg.ts` или вынесите отдельный renderer.
+6. Добавьте пункт в UI в `src/components/ControlsPanel.tsx`.
+
+Архитектура уже разделяет генерацию, валидацию, решение, рендеринг, трансформации и экспорт, поэтому можно добавлять hex, triangle, spiral, shape, collect-items, number/letter maze и другие типы.
+
+## 10. Как добавить новую визуальную тему
+
+1. Создайте файл темы в `src/maze/themes/`, например `robots.ts`.
+2. Опишите объект `WorksheetTheme`: цвета, подписи, иконки старта/финиша, декор, заголовок и инструкцию.
+3. Импортируйте тему в `src/maze/themes/index.ts`.
+4. Добавьте новое значение в тип `MazeTheme` в `src/maze/core/types.ts`.
+5. Добавьте пункт в список `themes` в `src/components/ControlsPanel.tsx`.
 
 ## Структура проекта
 
 ```txt
-index.html
-README.md
-css/
-  style.css
-js/
-  app.js
-  maze-generator.js
-  maze-solver.js
-  maze-renderer.js
-  export.js
-  themes.js
+src/
+  app/
+  components/
+  export/
+  maze/
+    core/
+    generators/
+    render/
+    solver/
+    themes/
+    transform/
+  presets/
+  styles/
 ```
 
-## Где что находится
+## Локальная проверка
 
-- `index.html` — разметка приложения и подключение обычных JS-файлов без `type="module"`.
-- `css/style.css` — стили интерфейса и предпросмотра.
-- `js/themes.js` — темы `basic`, `space`, `forest`, `cats` и режимы `color`, `coloring`, `minimal`.
-- `js/maze-generator.js` — seed random и генерация квадратного лабиринта.
-- `js/maze-solver.js` — поиск решения от старта до финиша.
-- `js/maze-renderer.js` — сборка SVG worksheet-страницы.
-- `js/export.js` — скачивание SVG и PNG.
-- `js/app.js` — связывает UI, генерацию, рендер и экспорт.
+Рекомендуемые команды:
 
-## Важно
+```bash
+npm install
+npm run dev
+npm run build
+```
 
-В проекте нет:
-
-- Vite;
-- React;
-- TypeScript;
-- npm-зависимостей;
-- `package.json`;
-- `node_modules`;
-- backend;
-- Docker;
-- сервера;
-- деплоя.
-
-Проект должен работать локально при простом открытии `index.html`.
+Проверьте в браузере: выбор типа лабиринта, сложности, темы, seed, поворот 15/30/45/90 градусов, показ/скрытие решения, SVG/PNG/PDF экспорт и режим coloring.

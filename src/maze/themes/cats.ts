@@ -1,0 +1,2 @@
+import type { WorksheetTheme } from './themeTypes';
+export const cats: WorksheetTheme = { id: 'cats', name: 'Cats', background: '#fff7ed', panel: '#ffffff', wall: '#7c2d12', accent: '#fb923c', accent2: '#db2777', soft: '#ffedd5', text: '#431407', solution: '#2563eb', icons: { start: '🐱', finish: '🧶', decor: ['♡', '⌁', '●', ' paw'] }, title: 'Помоги котёнку найти клубок!', instruction: 'Проведи линию от старта до финиша.' };
