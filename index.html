@@ -3,134 +3,82 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Фабрика чистых лабиринтов</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Maze Worksheet Studio</title>
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <noscript class="noscript panel">Для генерации лабиринтов включите JavaScript в браузере.</noscript>
     <main class="app-shell">
-      <section class="hero panel">
-        <div>
-          <p class="eyebrow">Vova Factory</p>
-          <h1>Конструктор чистых печатных лабиринтов</h1>
-          <p class="lead">
-            Генерируйте строгие лабиринты без картинок и эмодзи: круги, соты, спирали, кристаллы,
-            плетёные и волновые схемы с вращением, экспортом и AI-промптом для дальнейшей визуализации.
-          </p>
+      <aside class="controls-panel" aria-label="Настройки лабиринта">
+        <p class="eyebrow">Local HTML / CSS / JavaScript</p>
+        <h1>Maze Worksheet Studio</h1>
+        <p class="intro">Генератор детских SVG-лабиринтов без сборки, npm, React и сервера.</p>
+
+        <label>
+          Размер лабиринта
+          <select id="mazeSize">
+            <option value="8">8 × 8</option>
+            <option value="12" selected>12 × 12</option>
+            <option value="18">18 × 18</option>
+          </select>
+        </label>
+
+        <label>
+          Сложность
+          <select id="difficulty">
+            <option value="easy">easy</option>
+            <option value="medium" selected>medium</option>
+            <option value="hard">hard</option>
+          </select>
+        </label>
+
+        <label>
+          Seed
+          <input id="seedInput" type="text" value="worksheet-001" placeholder="Например: cats-001" />
+        </label>
+
+        <label>
+          Угол поворота
+          <input id="rotationInput" type="number" value="0" step="1" />
+        </label>
+
+        <label>
+          Тема
+          <select id="themeSelect">
+            <option value="basic">basic</option>
+            <option value="space">space</option>
+            <option value="forest">forest</option>
+            <option value="cats">cats</option>
+          </select>
+        </label>
+
+        <label>
+          Визуальный режим
+          <select id="visualMode">
+            <option value="color" selected>color</option>
+            <option value="coloring">coloring</option>
+            <option value="minimal">minimal</option>
+          </select>
+        </label>
+
+        <div class="button-grid">
+          <button id="generateButton" type="button">Generate Maze</button>
+          <button id="showSolutionButton" type="button" class="secondary">Show Solution</button>
+          <button id="hideSolutionButton" type="button" class="secondary">Hide Solution</button>
+          <button id="downloadSvgButton" type="button" class="download">Download SVG</button>
+          <button id="downloadPngButton" type="button" class="download">Download PNG</button>
         </div>
-        <div class="hero-badge" aria-hidden="true">⌁</div>
-      </section>
+      </aside>
 
-      <section class="workspace">
-        <aside class="controls panel" aria-label="Настройки лабиринта">
-          <h2>Настройки</h2>
-          <label>
-            Вид лабиринта
-            <select id="mazeType">
-              <option value="rect">Классический прямоугольный</option>
-              <option value="circle">Идеально круговой</option>
-              <option value="triangle">Треугольная сетка</option>
-              <option value="hex">Соты / гексагональный</option>
-              <option value="spiral">Спиральный тоннель</option>
-              <option value="crystal">Кристалл</option>
-              <option value="weave">Плетёный</option>
-              <option value="wave">Волновой</option>
-            </select>
-          </label>
-
-          <label>
-            Сложность
-            <select id="difficulty">
-              <option value="easy">Лёгкая</option>
-              <option value="medium" selected>Средняя</option>
-              <option value="hard">Сложная</option>
-              <option value="expert">Экспертная</option>
-            </select>
-          </label>
-
-          <label>
-            Палитра
-            <select id="theme">
-              <option value="ink">Типографская</option>
-              <option value="blueprint">Чертёжная</option>
-              <option value="neon">Неоновая</option>
-              <option value="sand">Песочная</option>
-              <option value="mint">Мятная</option>
-              <option value="mono">Монохромная</option>
-            </select>
-          </label>
-
-          <label>
-            Размер
-            <input id="size" type="range" min="8" max="30" value="16" />
-            <span id="sizeLabel">16 × 16</span>
-          </label>
-
-          <label>
-            Поворот готового лабиринта
-            <input id="rotation" type="range" min="-180" max="180" value="0" step="5" />
-            <span id="rotationLabel">0°</span>
-          </label>
-
-          <label>
-            Толщина линий
-            <input id="stroke" type="range" min="60" max="180" value="110" step="5" />
-            <span id="strokeLabel">110%</span>
-          </label>
-
-          <label>
-            Вариативность
-            <input id="seed" type="text" value="journal-001" />
-          </label>
-
-          <div class="toggles">
-            <label><input id="showSolution" type="checkbox" /> Показать решение</label>
-            <label><input id="openEntrances" type="checkbox" checked /> Открыть вход и выход</label>
-            <label><input id="invert" type="checkbox" /> Инвертировать фон</label>
-            <label><input id="guide" type="checkbox" /> Тонкая направляющая сетка</label>
-          </div>
-
-          <div class="button-row">
-            <button id="generateBtn" type="button">Сгенерировать</button>
-            <button id="randomBtn" type="button" class="secondary">Случайно</button>
-          </div>
-          <button id="downloadBtn" type="button" class="download">Скачать PNG</button>
-          <button id="svgBtn" type="button" class="download ghost">Скачать SVG</button>
-        </aside>
-
-        <section class="preview panel">
-          <div class="preview-header">
-            <div>
-              <p class="eyebrow">Предпросмотр</p>
-              <h2 id="mazeTitle">Классический прямоугольный</h2>
-            </div>
-            <div class="meta" id="mazeMeta">Средняя · Типографская</div>
-          </div>
-          <canvas id="mazeCanvas" width="1200" height="1200" aria-label="Сгенерированный лабиринт"></canvas>
-          <div class="prompt-box">
-            <label for="aiPrompt">AI-промпт для генератора изображений</label>
-            <textarea id="aiPrompt" readonly rows="3"></textarea>
-            <button id="copyPromptBtn" type="button" class="secondary">Скопировать промпт</button>
-          </div>
-        </section>
-      </section>
-
-      <section class="feature-grid">
-        <article class="panel">
-          <h3>Чистая геометрия</h3>
-          <p>Без картинок, эмодзи и декоративных объектов — только фон, линии, вход, выход и опциональное решение.</p>
-        </article>
-        <article class="panel">
-          <h3>10+ функций</h3>
-          <p>Формы, соты, спирали, плетение, волны, сложность, seed, поворот, толщина, палитры, инверсия, сетка, PNG/SVG и AI-промпт.</p>
-        </article>
-        <article class="panel">
-          <h3>Креативный уровень</h3>
-          <p>Необычные маски и стили превращают генератор в инструмент для журналов, постеров и печатных заданий.</p>
-        </article>
+      <section class="preview-panel" aria-label="Предпросмотр страницы">
+        <div id="worksheetPreview" class="worksheet-preview"></div>
       </section>
     </main>
 
-    <script src="app.js" defer></script>
+    <script src="js/themes.js"></script>
+    <script src="js/maze-solver.js"></script>
+    <script src="js/maze-generator.js"></script>
+    <script src="js/maze-renderer.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
