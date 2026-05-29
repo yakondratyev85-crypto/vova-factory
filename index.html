@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Фабрика лабиринтов для детских журналов</title>
+    <title>Фабрика чистых лабиринтов</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -12,13 +12,13 @@
       <section class="hero panel">
         <div>
           <p class="eyebrow">Vova Factory</p>
-          <h1>Генератор лабиринтов для детских журналов</h1>
+          <h1>Конструктор чистых печатных лабиринтов</h1>
           <p class="lead">
-            Создавайте прямоугольные, круглые, треугольные, гексагональные, островные и картинные лабиринты
-            с разной сложностью, стилем и готовым решением для редактора.
+            Генерируйте строгие лабиринты без картинок и эмодзи: круги, соты, спирали, кристаллы,
+            плетёные и волновые схемы с вращением, экспортом и AI-промптом для дальнейшей визуализации.
           </p>
         </div>
-        <div class="hero-badge" aria-hidden="true">✦</div>
+        <div class="hero-badge" aria-hidden="true">⌁</div>
       </section>
 
       <section class="workspace">
@@ -28,11 +28,13 @@
             Вид лабиринта
             <select id="mazeType">
               <option value="rect">Классический прямоугольный</option>
-              <option value="circle">Круговой спиральный</option>
+              <option value="circle">Идеально круговой</option>
               <option value="triangle">Треугольная сетка</option>
-              <option value="hex">Гексагональные соты</option>
-              <option value="islands">Острова и мостики</option>
-              <option value="picture">Картинка по каркасу</option>
+              <option value="hex">Соты / гексагональный</option>
+              <option value="spiral">Спиральный тоннель</option>
+              <option value="crystal">Кристалл</option>
+              <option value="weave">Плетёный</option>
+              <option value="wave">Волновой</option>
             </select>
           </label>
 
@@ -47,14 +49,14 @@
           </label>
 
           <label>
-            Стиль оформления
+            Палитра
             <select id="theme">
-              <option value="space">Космос</option>
-              <option value="jungle">Джунгли</option>
-              <option value="sea">Море</option>
-              <option value="candy">Сладости</option>
-              <option value="dino">Динозавры</option>
-              <option value="fairy">Сказка</option>
+              <option value="ink">Типографская</option>
+              <option value="blueprint">Чертёжная</option>
+              <option value="neon">Неоновая</option>
+              <option value="sand">Песочная</option>
+              <option value="mint">Мятная</option>
+              <option value="mono">Монохромная</option>
             </select>
           </label>
 
@@ -65,13 +67,27 @@
           </label>
 
           <label>
+            Поворот готового лабиринта
+            <input id="rotation" type="range" min="-180" max="180" value="0" step="5" />
+            <span id="rotationLabel">0°</span>
+          </label>
+
+          <label>
+            Толщина линий
+            <input id="stroke" type="range" min="60" max="180" value="110" step="5" />
+            <span id="strokeLabel">110%</span>
+          </label>
+
+          <label>
             Вариативность
             <input id="seed" type="text" value="journal-001" />
           </label>
 
           <div class="toggles">
             <label><input id="showSolution" type="checkbox" /> Показать решение</label>
-            <label><input id="decorate" type="checkbox" checked /> Красивая картинка вокруг каркаса</label>
+            <label><input id="openEntrances" type="checkbox" checked /> Открыть вход и выход</label>
+            <label><input id="invert" type="checkbox" /> Инвертировать фон</label>
+            <label><input id="guide" type="checkbox" /> Тонкая направляющая сетка</label>
           </div>
 
           <div class="button-row">
@@ -79,6 +95,7 @@
             <button id="randomBtn" type="button" class="secondary">Случайно</button>
           </div>
           <button id="downloadBtn" type="button" class="download">Скачать PNG</button>
+          <button id="svgBtn" type="button" class="download ghost">Скачать SVG</button>
         </aside>
 
         <section class="preview panel">
@@ -87,24 +104,29 @@
               <p class="eyebrow">Предпросмотр</p>
               <h2 id="mazeTitle">Классический прямоугольный</h2>
             </div>
-            <div class="meta" id="mazeMeta">Средняя · Космос</div>
+            <div class="meta" id="mazeMeta">Средняя · Типографская</div>
           </div>
-          <canvas id="mazeCanvas" width="1100" height="1100" aria-label="Сгенерированный лабиринт"></canvas>
+          <canvas id="mazeCanvas" width="1200" height="1200" aria-label="Сгенерированный лабиринт"></canvas>
+          <div class="prompt-box">
+            <label for="aiPrompt">AI-промпт для генератора изображений</label>
+            <textarea id="aiPrompt" readonly rows="3"></textarea>
+            <button id="copyPromptBtn" type="button" class="secondary">Скопировать промпт</button>
+          </div>
         </section>
       </section>
 
       <section class="feature-grid">
         <article class="panel">
-          <h3>Все основные формы</h3>
-          <p>DFS-генерация с адаптированной визуализацией: клетки, кольца, треугольники, соты, острова и сюжетные рамки.</p>
+          <h3>Чистая геометрия</h3>
+          <p>Без картинок, эмодзи и декоративных объектов — только фон, линии, вход, выход и опциональное решение.</p>
         </article>
         <article class="panel">
-          <h3>Для печати</h3>
-          <p>Высокое разрешение canvas, контрастные линии, старт/финиш, опциональный путь решения и экспорт в PNG.</p>
+          <h3>10+ функций</h3>
+          <p>Формы, соты, спирали, плетение, волны, сложность, seed, поворот, толщина, палитры, инверсия, сетка, PNG/SVG и AI-промпт.</p>
         </article>
         <article class="panel">
-          <h3>Оформление</h3>
-          <p>Темы добавляют палитру, фоновые иллюстрации, героев и декоративные элементы вокруг лабиринта.</p>
+          <h3>Креативный уровень</h3>
+          <p>Необычные маски и стили превращают генератор в инструмент для журналов, постеров и печатных заданий.</p>
         </article>
       </section>
     </main>
