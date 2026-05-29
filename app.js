@@ -207,6 +207,10 @@ function drawRectMaze(grid, cfg, random) {
   if (cfg.showSolution) drawSolution(solutionPath(grid), pad, cellW, cellH, cfg);
 }
 
+function triangleCenter(cellData, pad, cell, height) {
+  return [pad + cellData.x * cell + cell / 2, pad + cellData.y * height + height / 2];
+}
+
 function drawTriangleMaze(grid, cfg) {
   const pad = 130;
   const w = canvas.width - pad * 2;
@@ -229,7 +233,14 @@ function drawTriangleMaze(grid, cfg) {
       ctx.beginPath(); ctx.moveTo(point[0], point[1]); ctx.lineTo(next[0], next[1]); ctx.stroke();
     });
   });
+  if (cfg.showSolution) {
+    drawPointSolution(solutionPath(grid).map((cellData) => triangleCenter(cellData, pad, cell, height)), cfg, cell);
+  }
   drawMarkers(pad + cell * 0.5, pad + height * 0.5, pad + w - cell * 0.5, pad + grid.length * height - height * 0.5, cfg);
+}
+
+function hexCenter(cellData, pad, radius, h) {
+  return [pad + radius + cellData.x * radius * 1.5, pad + radius + cellData.y * h + (cellData.x % 2 ? h / 2 : 0)];
 }
 
 function drawHexMaze(grid, cfg) {
@@ -252,7 +263,16 @@ function drawHexMaze(grid, cfg) {
       ctx.beginPath(); ctx.moveTo(pts[a][0], pts[a][1]); ctx.lineTo(pts[b][0], pts[b][1]); ctx.stroke();
     });
   });
+  if (cfg.showSolution) {
+    drawPointSolution(solutionPath(grid).map((cellData) => hexCenter(cellData, pad, radius, h)), cfg, radius);
+  }
   drawMarkers(pad + radius, pad + radius, pad + radius + (grid[0].length - 1) * radius * 1.5, pad + radius + (grid.length - 1) * h, cfg);
+}
+
+function circleCenter(cellData, sectors, step) {
+  const angle = ((cellData.x + 0.5) / sectors) * Math.PI * 2 - Math.PI / 2;
+  const radius = 52 + (cellData.y + 0.5) * step;
+  return [canvas.width / 2 + Math.cos(angle) * radius, canvas.height / 2 + Math.sin(angle) * radius];
 }
 
 function drawCircleMaze(grid, cfg) {
@@ -276,6 +296,9 @@ function drawCircleMaze(grid, cfg) {
       if (cell.walls.w) radial(cx, cy, r1, r2, a1);
       if (cell.walls.e) radial(cx, cy, r1, r2, a2);
     }
+  }
+  if (cfg.showSolution) {
+    drawPointSolution(solutionPath(grid).map((cellData) => circleCenter(cellData, sectors, step)), cfg, step);
   }
   drawMarkers(cx, cy - 32, cx, cy + maxR - step / 2, cfg);
 }
@@ -316,20 +339,22 @@ function drawIslands(grid, cfg, pad, cellW, cellH, random) {
   ctx.restore();
 }
 
-function drawSolution(path, pad, cellW, cellH, cfg) {
+function drawPointSolution(points, cfg, scale) {
   ctx.save();
   ctx.strokeStyle = cfg.theme.accent;
-  ctx.lineWidth = Math.max(7, Math.min(cellW, cellH) * 0.24);
+  ctx.lineWidth = Math.max(7, scale * 0.24);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.beginPath();
-  path.forEach((cell, index) => {
-    const x = pad + cell.x * cellW + cellW / 2;
-    const y = pad + cell.y * cellH + cellH / 2;
+  points.forEach(([x, y], index) => {
     if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
   ctx.stroke();
   ctx.restore();
+}
+
+function drawSolution(path, pad, cellW, cellH, cfg) {
+  drawPointSolution(path.map((cell) => [pad + cell.x * cellW + cellW / 2, pad + cell.y * cellH + cellH / 2]), cfg, Math.min(cellW, cellH));
 }
 
 function drawMarkers(sx, sy, gx, gy, cfg) {
