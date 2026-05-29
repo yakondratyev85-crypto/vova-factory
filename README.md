@@ -1,96 +1,142 @@
 # Maze Worksheet Studio
 
-Минимальный локальный MVP на **React + TypeScript + Vite**. Сейчас проект специально упрощён до стабильной базы: один квадратный SVG-лабиринт, seed, поворот, кнопки Generate / Show Solution / Hide Solution.
+Локальный MVP-проект на **React + TypeScript + Vite** для генерации детских лабиринтов в формате готовой worksheet-страницы. Основной рендеринг выполняется в **SVG**, поэтому страницу удобно масштабировать, печатать и экспортировать в SVG/PNG/PDF.
 
-## Как запустить локально
-
-1. Открыть папку проекта в терминале.
-2. Установить зависимости:
+## 1. Установка зависимостей
 
 ```bash
 npm install
 ```
 
-3. Запустить Vite:
+## 2. Запуск локально
 
 ```bash
 npm run dev
 ```
 
-4. Открыть адрес, который покажет Vite, например:
+## 3. Как открыть проект в браузере
+
+После запуска Vite откройте адрес из терминала, обычно:
 
 ```txt
 http://localhost:5173
 ```
 
-## Что должно быть видно в браузере
+Проект не требует сервера, базы данных, Docker, авторизации, облачного хранения или деплоя.
 
-На странице должно открыться приложение **Maze Worksheet Studio**:
+## 4. Как пользоваться генератором
 
-- слева — панель настроек;
-- справа — зона предпросмотра;
-- поле `Seed`;
-- поле `Rotation Angle`;
-- кнопка `Generate`;
-- кнопка `Show Solution`;
-- кнопка `Hide Solution`;
-- простой SVG-лабиринт 12 × 12;
-- зелёный старт `START`;
-- красный финиш `FINISH`;
-- синяя линия решения, которую можно показать и скрыть.
+1. В левой панели выберите пресет или настройте страницу вручную.
+2. Выберите `Maze Type`: `square`, `rectangle`, `circle` или `road`.
+3. Настройте `Difficulty`, `Theme`, `Visual Mode`, `Page Format`, `Algorithm`, `Seed`, `Rotation Angle`, `Line Width` и `Path Width`.
+4. Нажмите **Generate**.
+5. Справа появится предпросмотр печатной страницы с заголовком, инструкцией, рамкой, именем ребёнка, стартом, финишем и тематическим декором.
+6. Для автоматической журнальной композиции нажмите **Create Worksheet Page**.
 
-## Как пользоваться
+## 5. Как включить и выключить решение
 
-1. Измените `Seed`.
-2. Нажмите `Generate` — лабиринт пересоздастся по seed.
-3. Введите угол в `Rotation Angle`, например `15`, `30`, `45` или `90`.
-4. Нажмите `Show Solution`, чтобы увидеть решение.
-5. Нажмите `Hide Solution`, чтобы скрыть решение.
+- Нажмите **Show Solution**, чтобы показать цветную линию решения поверх лабиринта.
+- Нажмите **Hide Solution**, чтобы скрыть решение.
+- В поле `Solution Mode` доступны режимы:
+  - `none` — без решения;
+  - `overlay` — решение поверх лабиринта;
+  - `separatePage` — при PDF-экспорте добавляется отдельная страница с ответом;
+  - `teacher` — зарезервировано для будущего teacher-view режима.
 
-Один и тот же seed создаёт один и тот же лабиринт.
+## 6. Как экспортировать PNG/SVG/PDF
 
-## Если не запускается
+В верхней части предпросмотра есть кнопки:
 
-Для macOS / Linux:
+- **Export SVG** — сохраняет текущую worksheet-страницу как SVG.
+- **Export PNG** — конвертирует текущий SVG в canvas и сохраняет PNG выбранного размера страницы.
+- **Export PDF** — создаёт PDF через `jsPDF`.
 
-```bash
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
-```
+Если выбран `solutionMode: separatePage`, PDF содержит:
 
-Для Windows PowerShell:
+1. страницу с лабиринтом без решения;
+2. страницу с тем же лабиринтом и решением.
 
-```powershell
-Remove-Item -Recurse -Force node_modules
-Remove-Item package-lock.json
-npm install
-npm run dev
-```
+## 7. Где находятся генераторы лабиринтов
 
-## Текущая структура
+Генераторы находятся в папке:
 
 ```txt
-package.json
-index.html
-tsconfig.json
-vite.config.ts
-src/main.tsx
-src/App.tsx
-src/App.css
-src/maze/types.ts
-src/maze/generateSquareMaze.ts
-src/maze/solveMaze.ts
-src/maze/renderMazeSvg.tsx
+src/maze/generators/
 ```
 
-## Где находится логика лабиринта
+Основные файлы:
 
-- `src/maze/generateSquareMaze.ts` — генерация квадратного лабиринта recursive backtracking.
-- `src/maze/solveMaze.ts` — поиск решения от старта до финиша.
-- `src/maze/renderMazeSvg.tsx` — SVG-отрисовка стен, старта, финиша, решения и поворота.
-- `src/App.tsx` — простой экран приложения и управление настройками.
+- `squareMaze.ts` — квадратный лабиринт;
+- `rectangleMaze.ts` — прямоугольный лабиринт;
+- `circleMaze.ts` — круговой лабиринт на кольцах и секторах;
+- `roadMaze.ts` — широкая дорожка для малышей;
+- `backtracking.ts` — алгоритм recursive backtracking;
+- `prim.ts` — алгоритм Prim;
+- `index.ts` — единая точка выбора генератора по `settings.mazeType`.
 
-## Что временно отключено
+## 8. Где находятся темы
 
-Чтобы сначала стабилизировать локальный запуск, временно не добавлены сложные функции: PDF/PNG/SVG export, темы, круговой maze, road maze, batch generation и премиальный дизайн. Их можно возвращать постепенно после того, как базовый проект стабильно запускается через `npm install` и `npm run dev`.
+Темы находятся в папке:
+
+```txt
+src/maze/themes/
+```
+
+В MVP добавлены 5 тем:
+
+- `space.ts`;
+- `forest.ts`;
+- `ocean.ts`;
+- `dinosaurs.ts`;
+- `cats.ts`.
+
+Общие типы темы находятся в `src/maze/themes/themeTypes.ts`.
+
+## 9. Как добавить новый тип лабиринта
+
+1. Добавьте новое значение в тип `MazeType` или `FutureMazeType` в `src/maze/core/types.ts`.
+2. Создайте генератор в `src/maze/generators/newMaze.ts`.
+3. Верните объект `MazeModel` со стартом, финишем и массивом `solution`.
+4. Подключите генератор в `src/maze/generators/index.ts`.
+5. Добавьте SVG-отрисовку в `src/maze/render/renderMazeSvg.ts` или вынесите отдельный renderer.
+6. Добавьте пункт в UI в `src/components/ControlsPanel.tsx`.
+
+Архитектура уже разделяет генерацию, валидацию, решение, рендеринг, трансформации и экспорт, поэтому можно добавлять hex, triangle, spiral, shape, collect-items, number/letter maze и другие типы.
+
+## 10. Как добавить новую визуальную тему
+
+1. Создайте файл темы в `src/maze/themes/`, например `robots.ts`.
+2. Опишите объект `WorksheetTheme`: цвета, подписи, иконки старта/финиша, декор, заголовок и инструкцию.
+3. Импортируйте тему в `src/maze/themes/index.ts`.
+4. Добавьте новое значение в тип `MazeTheme` в `src/maze/core/types.ts`.
+5. Добавьте пункт в список `themes` в `src/components/ControlsPanel.tsx`.
+
+## Структура проекта
+
+```txt
+src/
+  app/
+  components/
+  export/
+  maze/
+    core/
+    generators/
+    render/
+    solver/
+    themes/
+    transform/
+  presets/
+  styles/
+```
+
+## Локальная проверка
+
+Рекомендуемые команды:
+
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+Проверьте в браузере: выбор типа лабиринта, сложности, темы, seed, поворот 15/30/45/90 градусов, показ/скрытие решения, SVG/PNG/PDF экспорт и режим coloring.

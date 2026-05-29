@@ -1,0 +1,9 @@
+import type { MazeSettings } from '../maze/core/types';
+export const defaultSettings: MazeSettings = { mazeType: 'square', difficulty: 'easy', visualMode: 'color', theme: 'space', algorithm: 'backtracking', seed: 'journal-001', pageFormat: '900x1200', customWidth: 900, customHeight: 1200, rotationAngle: 0, rotateMazeOnly: true, rotateFullComposition: false, showSolution: false, solutionMode: 'overlay', lineWidth: 4, pathWidth: 28, title: 'Помоги космонавту добраться до ракеты!', instruction: 'Найди безопасный путь через космос.', startLabel: 'Старт', finishLabel: 'Финиш', taskNumber: 1 };
+export const presets: { name: string; settings: MazeSettings }[] = [
+ { name: 'Космический лабиринт', settings: { ...defaultSettings } },
+ { name: 'Лесной лабиринт', settings: { ...defaultSettings, mazeType: 'rectangle', theme: 'forest', difficulty: 'medium', pageFormat: 'A4_PORTRAIT', visualMode: 'premium', seed: 'forest-002', title: 'Помоги зверьку найти лесной домик!', instruction: 'Проведи линию от старта до финиша.', taskNumber: 2 } },
+ { name: 'Круговой лабиринт', settings: { ...defaultSettings, mazeType: 'circle', theme: 'ocean', difficulty: 'hard', pageFormat: '1024x1024', seed: 'ocean-circle-003', title: 'Помоги рыбке найти ракушку!', instruction: 'Плыви по проходам и не заблудись среди волн.', taskNumber: 3 } },
+ { name: 'Лабиринт-дорожка для малышей', settings: { ...defaultSettings, mazeType: 'road', theme: 'cats', difficulty: 'toddler', pageFormat: '900x1200', visualMode: 'coloring', seed: 'kitten-road-004', lineWidth: 5, pathWidth: 42, title: 'Помоги котёнку найти клубок!', instruction: 'Проведи линию от старта до финиша.', taskNumber: 4 } },
+ { name: 'Динозавры', settings: { ...defaultSettings, mazeType: 'square', theme: 'dinosaurs', difficulty: 'medium', pageFormat: '1080x1350', seed: 'dino-005', title: 'Помоги динозаврику вернуться в гнездо!', instruction: 'Не заблудись среди следов.', taskNumber: 5 } },
+];

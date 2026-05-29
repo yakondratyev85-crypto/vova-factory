@@ -1,0 +1,4 @@
+import type { MazeModel } from '../core/types';
+export function solutionPolyline(model: MazeModel, mazeW: number, mazeH: number): string { if (model.type === 'circle') { const cx = mazeW / 2, cy = mazeH / 2; const maxR = Math.min(mazeW, mazeH) * 0.46; const ringW = maxR / model.rows; return model.solution.map(p => { const r = maxR - (p.y + 0.5) * ringW; const a = ((p.x + 0.5) / model.cols) * Math.PI * 2 - Math.PI / 2; return `${cx + Math.cos(a) * r},${cy + Math.sin(a) * r}`; }).join(' '); }
+ const cw = mazeW / model.cols, ch = mazeH / model.rows; return model.solution.map(p => `${(p.x + 0.5) * cw},${(p.y + 0.5) * ch}`).join(' '); }
+export function renderSolutionSvg(model: MazeModel, mazeW: number, mazeH: number, color: string, pathWidth: number): string { return `<polyline points="${solutionPolyline(model, mazeW, mazeH)}" fill="none" stroke="${color}" stroke-width="${Math.max(4, pathWidth * 0.28)}" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`; }
