@@ -1,4 +1,25 @@
-const canvas = document.querySelector('#mazeCanvas');
+function fallbackControl(value = '', checked = false) {
+  return {
+    value,
+    checked,
+    textContent: '',
+    options: [{ value }],
+    addEventListener: () => {},
+    select: () => {},
+  };
+}
+
+function requiredElement(selector) {
+  const element = document.querySelector(selector);
+  if (!element) throw new Error(`Не найден обязательный элемент ${selector}`);
+  return element;
+}
+
+function optionalControl(selector, value = '', checked = false) {
+  return document.querySelector(selector) || fallbackControl(value, checked);
+}
+
+const canvas = requiredElement('#mazeCanvas');
 const ctx = canvas.getContext('2d');
 const controls = {
   type: document.querySelector('#mazeType'),
