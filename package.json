@@ -1,0 +1,9 @@
+{
+  "name": "vova-factory-maze-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Printable children's magazine maze generator.",
+  "scripts": {
+    "test": "node --check app.js && node smoke-test.js"
+  }
+}
