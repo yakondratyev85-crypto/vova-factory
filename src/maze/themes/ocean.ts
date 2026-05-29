@@ -1,0 +1,2 @@
+import type { WorksheetTheme } from './themeTypes';
+export const ocean: WorksheetTheme = { id: 'ocean', name: 'Ocean', background: '#ecfeff', panel: '#ffffff', wall: '#0e7490', accent: '#06b6d4', accent2: '#f97316', soft: '#cffafe', text: '#164e63', solution: '#f43f5e', icons: { start: '🐠', finish: '🐚', decor: ['○', '≈', '◌', '🐟'] }, title: 'Помоги рыбке найти ракушку!', instruction: 'Плыви по проходам и не заблудись среди волн.' };

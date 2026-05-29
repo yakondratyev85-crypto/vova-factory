@@ -1,0 +1,2 @@
+import type { WorksheetTheme } from './themeTypes';
+export const dinosaurs: WorksheetTheme = { id: 'dinosaurs', name: 'Dinosaurs', background: '#fefce8', panel: '#fffef2', wall: '#3f6212', accent: '#84cc16', accent2: '#ea580c', soft: '#ecfccb', text: '#365314', solution: '#dc2626', icons: { start: '🦕', finish: '🥚', decor: ['▲', '●', '⋒', '◒'] }, title: 'Помоги динозаврику вернуться в гнездо!', instruction: 'Не заблудись среди следов и вулканов.' };
