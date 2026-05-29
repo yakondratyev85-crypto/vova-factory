@@ -37,6 +37,16 @@ button, input, select { font: inherit; }
   backdrop-filter: blur(18px);
 }
 
+.noscript {
+  display: block;
+  width: min(1480px, calc(100% - 32px));
+  margin: 24px auto 0;
+  padding: 18px 24px;
+  color: #9d174d;
+  font-weight: 800;
+  text-align: center;
+}
+
 .hero {
   display: flex;
   justify-content: space-between;
