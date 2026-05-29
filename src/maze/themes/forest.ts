@@ -1,0 +1,2 @@
+import type { WorksheetTheme } from './themeTypes';
+export const forest: WorksheetTheme = { id: 'forest', name: 'Forest', background: '#f0fdf4', panel: '#fffdf6', wall: '#166534', accent: '#22c55e', accent2: '#a16207', soft: '#dcfce7', text: '#14532d', solution: '#dc2626', icons: { start: '🦊', finish: '🏡', decor: ['♧', '🍄', '☘', '●'] }, title: 'Помоги зверьку найти лесной домик!', instruction: 'Проведи линию от старта до финиша.' };

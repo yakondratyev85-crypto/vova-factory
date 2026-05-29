@@ -1,0 +1,3 @@
+import type { MazeModel, MazeSettings, ValidationResult } from '../maze/core/types';
+import { ExportButtons } from './ExportButtons';
+export function MazePreview({ svg, settings, model, validation }: { svg: string; settings: MazeSettings; model: MazeModel; validation: ValidationResult }) { return <section className="preview"><div className="preview-toolbar"><div><strong>Preview</strong><span>{settings.pageFormat} · {model.cols}×{model.rows} · seed {settings.seed}</span></div><ExportButtons svg={svg} settings={settings} model={model} /></div><div className="paper-stage"><div className="paper" dangerouslySetInnerHTML={{ __html: svg }} /></div><div className={validation.valid ? 'validation ok' : 'validation warn'}>{validation.messages.join(' ')}</div></section>; }
