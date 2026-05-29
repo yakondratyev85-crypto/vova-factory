@@ -1,0 +1,2 @@
+import type { WorksheetTheme } from './themeTypes';
+export const space: WorksheetTheme = { id: 'space', name: 'Space', background: '#eef2ff', panel: '#ffffff', wall: '#312e81', accent: '#7c3aed', accent2: '#f59e0b', soft: '#dbeafe', text: '#172554', solution: '#ef4444', icons: { start: '👩‍🚀', finish: '🚀', decor: ['★', '✦', '◐', '●'] }, title: 'Помоги космонавту добраться до ракеты!', instruction: 'Найди безопасный путь через космос.' };
