@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 const controls = {
   type: document.querySelector('#mazeType'),
   difficulty: document.querySelector('#difficulty'),
+  pattern: document.querySelector('#pattern'),
   theme: document.querySelector('#theme'),
   size: document.querySelector('#size'),
   sizeLabel: document.querySelector('#sizeLabel'),
@@ -84,7 +85,18 @@ function makeGrid(cols, rows) {
   })));
 }
 
-function carveMaze(cols, rows, random, braid = 0) {
+function orderDirections(dirs, current, random, pattern) {
+  const shuffled = shuffle([...dirs], random);
+  if (pattern === 'corridors' && current.fromDir) {
+    return shuffled.sort((a, b) => Number(b[0] === current.fromDir) - Number(a[0] === current.fromDir));
+  }
+  if (pattern === 'turns' && current.fromDir) {
+    return shuffled.sort((a, b) => Number(a[0] === current.fromDir) - Number(b[0] === current.fromDir));
+  }
+  return shuffled;
+}
+
+function carveMaze(cols, rows, random, braid = 0, pattern = 'balanced') {
   const grid = makeGrid(cols, rows);
   const stack = [grid[0][0]];
   grid[0][0].visited = true;
@@ -94,7 +106,7 @@ function carveMaze(cols, rows, random, braid = 0) {
 
   while (stack.length) {
     const current = stack[stack.length - 1];
-    const choices = shuffle([...dirs], random).filter(([, dx, dy]) => {
+    const choices = orderDirections(dirs, current, random, pattern).filter(([, dx, dy]) => {
       const next = grid[current.y + dy]?.[current.x + dx];
       return next && !next.visited;
     });
@@ -105,6 +117,7 @@ function carveMaze(cols, rows, random, braid = 0) {
     next.walls[back] = false;
     next.visited = true;
     next.prev = current;
+    next.fromDir = dir;
     stack.push(next);
   }
 
@@ -189,6 +202,7 @@ function config() {
   return {
     type,
     difficulty: controls.difficulty.value,
+    pattern: controls.pattern.value,
     theme: themes[controls.theme.value],
     seed: controls.seed.value || 'maze',
     showSolution: controls.showSolution.checked,
@@ -313,6 +327,7 @@ function drawRectLikeMaze(grid, cfg) {
     }
   });
 
+  const segments = [];
   grid.flat().forEach((cell) => {
     const [cx, cy] = rectCenter(cell, pad, cellW, cellH, cfg.type);
     const halfW = cellW / 2;
@@ -325,6 +340,7 @@ function drawRectLikeMaze(grid, cfg) {
     if (cell.walls.w && !shouldOpen(cell, 'w', grid, cfg)) { ctx.moveTo(cx - halfW, cy + halfH - skew); ctx.lineTo(cx - halfW, cy - halfH - skew); }
     ctx.stroke();
   });
+  drawMergedOrthogonalSegments(segments);
 
   if (cfg.showSolution) {
     drawPointSolution(solutionPath(grid).map((cell) => rectCenter(cell, pad, cellW, cellH, cfg.type)), cfg, Math.min(cellW, cellH));
@@ -545,6 +561,7 @@ function randomize() {
   const option = (select) => select.options[Math.floor(Math.random() * select.options.length)].value;
   controls.type.value = option(controls.type);
   controls.difficulty.value = option(controls.difficulty);
+  controls.pattern.value = option(controls.pattern);
   controls.theme.value = option(controls.theme);
   controls.size.value = String(8 + Math.floor(Math.random() * 23));
   controls.rotation.value = String((Math.floor(Math.random() * 73) - 36) * 5);
